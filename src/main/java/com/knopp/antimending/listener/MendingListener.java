@@ -83,25 +83,24 @@ public class MendingListener implements Listener {
         
         if (changed) {
             inv.setContents(contents);
+        }
+
+        // Clean item on cursor to prevent desyncs/duplications
+        ItemStack cursor = player.getItemOnCursor();
+        if (cursor != null && !cursor.isEmpty() && stripMending(cursor)) {
+            player.setItemOnCursor(cursor);
+            changed = true;
+        }
+
+        if (changed) {
             player.updateInventory();
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        cleanPlayer(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onInventoryOpen(InventoryOpenEvent event) {
-        if (event.getPlayer() instanceof Player) {
-            cleanPlayer((Player) event.getPlayer());
-        }
-        
-        // Clean the inventory being opened
-        org.bukkit.inventory.Inventory inv = event.getInventory();
-        ItemStack[] contents = inv.getContents();
+    public void cleanInventory(org.bukkit.inventory.Inventory inv) {
+        if (inv == null) return;
         boolean changed = false;
+        ItemStack[] contents = inv.getContents();
         for (int i = 0; i < contents.length; i++) {
             if (contents[i] != null && stripMending(contents[i])) {
                 changed = true;
@@ -113,23 +112,41 @@ public class MendingListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onInventoryClick(InventoryClickEvent event) {
-        ItemStack current = event.getCurrentItem();
-        if (current != null && stripMending(current)) {
-            event.setCurrentItem(current);
-        }
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        cleanPlayer(event.getPlayer());
+    }
 
-        ItemStack cursor = event.getCursor();
-        if (cursor != null && stripMending(cursor)) {
-            event.getView().setCursor(cursor);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        if (event.getPlayer() instanceof Player player) {
+            cleanPlayer(player);
+        }
+        cleanInventory(event.getInventory());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getWhoClicked() instanceof Player player) {
+            // Modifying items DURING the click event can break Bukkit's internal item tracking
+            // and cause duplication, especially in Creative mode. 
+            // We schedule a clean 1 tick later after the event has naturally resolved.
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                cleanPlayer(player);
+                cleanInventory(event.getInventory());
+            });
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryCreative(InventoryCreativeEvent event) {
-        ItemStack item = event.getCursor();
-        if (item != null && stripMending(item)) {
-            event.setCursor(item);
+        // Creative inventory events are also clicks, but we handle them identically:
+        // Let the creative event finish processing so the server receives the client's new item,
+        // then strip Mending from everything 1 tick later.
+        if (event.getWhoClicked() instanceof Player player) {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                cleanPlayer(player);
+                cleanInventory(event.getInventory());
+            });
         }
     }
 
