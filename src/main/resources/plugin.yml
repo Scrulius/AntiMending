@@ -2,5 +2,5 @@ name: AntiMending
 version: 1.0.0
 main: com.knopp.antimending.AntiMendingPlugin
 api-version: '1.21'
-author: Knopp
+author: Melonzio
 description: Bloquea el encantamiento de reparación (Mending) por completo.
