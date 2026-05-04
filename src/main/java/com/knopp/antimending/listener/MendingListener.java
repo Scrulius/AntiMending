@@ -72,14 +72,17 @@ public class MendingListener implements Listener {
     public void cleanPlayer(Player player) {
         org.bukkit.inventory.PlayerInventory inv = player.getInventory();
         boolean changed = false;
-        for (int i = 0; i < inv.getSize(); i++) {
-            ItemStack item = inv.getItem(i);
-            if (item != null && stripMending(item)) {
-                inv.setItem(i, item);
+        
+        // Use getContents to check everything at once (including armor in 1.21)
+        ItemStack[] contents = inv.getContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] != null && stripMending(contents[i])) {
                 changed = true;
             }
         }
+        
         if (changed) {
+            inv.setContents(contents);
             player.updateInventory();
         }
     }
@@ -95,13 +98,17 @@ public class MendingListener implements Listener {
             cleanPlayer((Player) event.getPlayer());
         }
         
-        // Also clean the inventory being opened
+        // Clean the inventory being opened
         org.bukkit.inventory.Inventory inv = event.getInventory();
-        for (int i = 0; i < inv.getSize(); i++) {
-            ItemStack item = inv.getItem(i);
-            if (item != null && stripMending(item)) {
-                inv.setItem(i, item);
+        ItemStack[] contents = inv.getContents();
+        boolean changed = false;
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] != null && stripMending(contents[i])) {
+                changed = true;
             }
+        }
+        if (changed) {
+            inv.setContents(contents);
         }
     }
 

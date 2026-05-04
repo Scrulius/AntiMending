@@ -11,13 +11,6 @@ public class AntiMendingPlugin extends JavaPlugin {
         MendingListener listener = new MendingListener(this);
         getServer().getPluginManager().registerEvents(listener, this);
         
-        // Repeating task to clean all players every 5 seconds (100 ticks)
-        getServer().getScheduler().runTaskTimer(this, () -> {
-            for (org.bukkit.entity.Player player : getServer().getOnlinePlayers()) {
-                listener.cleanPlayer(player);
-            }
-        }, 100L, 100L);
-        
         getLogger().info("AntiMending has been enabled. Mending disabled!");
     }
 
