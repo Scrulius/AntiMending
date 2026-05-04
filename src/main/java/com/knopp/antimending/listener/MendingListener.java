@@ -67,8 +67,6 @@ public class MendingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getWhoClicked().hasPermission("antimending.bypass")) return;
-
         ItemStack current = event.getCurrentItem();
         if (current != null && stripMending(current)) {
             event.setCurrentItem(current);
@@ -82,8 +80,6 @@ public class MendingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityPickup(EntityPickupItemEvent event) {
-        if (event.getEntity().hasPermission("antimending.bypass")) return;
-
         ItemStack item = event.getItem().getItemStack();
         if (stripMending(item)) {
             event.getItem().setItemStack(item);
@@ -105,7 +101,6 @@ public class MendingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerItemMend(PlayerItemMendEvent event) {
-        if (event.getPlayer().hasPermission("antimending.bypass")) return;
         // Block the event so experience does not repair the object
         event.setCancelled(true);
     }
