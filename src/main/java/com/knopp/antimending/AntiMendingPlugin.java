@@ -7,13 +7,13 @@ public class AntiMendingPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Registrar el listener de eventos
+        // Register the event listener
         getServer().getPluginManager().registerEvents(new MendingListener(this), this);
-        getLogger().info("AntiMending ha sido habilitado. ¡Mending desactivado!");
+        getLogger().info("AntiMending has been enabled. Mending disabled!");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("AntiMending ha sido deshabilitado.");
+        getLogger().info("AntiMending has been disabled.");
     }
 }

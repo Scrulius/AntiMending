@@ -31,10 +31,10 @@ public class MendingListener implements Listener {
     public MendingListener(AntiMendingPlugin plugin) {
         this.plugin = plugin;
         try {
-            // Métodos modernos de registro en Paper 1.21
+            // Modern registry methods for Paper 1.21
             this.mendingEnchant = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("mending"));
         } catch (Exception e) {
-            plugin.getLogger().warning("No se pudo cargar el encantamiento Mending del registro, usando fallback.");
+            plugin.getLogger().warning("Could not load Mending enchantment from registry, using fallback.");
         }
     }
 
@@ -80,7 +80,7 @@ public class MendingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerItemMend(PlayerItemMendEvent event) {
-        // Bloquea el evento para que la experiencia no repare el objeto
+        // Block the event so experience does not repair the object
         event.setCancelled(true);
     }
 
@@ -106,7 +106,7 @@ public class MendingListener implements Listener {
         ItemStack result = recipe.getResult();
         
         if (hasMending(result)) {
-            // Cancelar completamente el evento hace que el aldeano no obtenga este trade en absoluto
+            // Cancelling the event entirely prevents the villager from acquiring this trade at all
             event.setCancelled(true);
         }
     }
