@@ -20,6 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -63,6 +66,43 @@ public class MendingListener implements Listener {
         }
 
         return stripped;
+    }
+
+    public void cleanPlayer(Player player) {
+        boolean changed = false;
+        ItemStack[] contents = player.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (stripMending(contents[i])) {
+                changed = true;
+            }
+        }
+        if (changed) {
+            player.getInventory().setContents(contents);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        cleanPlayer(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        if (event.getPlayer() instanceof Player) {
+            cleanPlayer((Player) event.getPlayer());
+        }
+        
+        // Also clean the inventory being opened
+        boolean changed = false;
+        ItemStack[] contents = event.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (stripMending(contents[i])) {
+                changed = true;
+            }
+        }
+        if (changed) {
+            event.getInventory().setContents(contents);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
