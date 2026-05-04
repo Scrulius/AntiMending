@@ -178,19 +178,6 @@ public class MendingListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPrepareAnvil(PrepareAnvilEvent event) {
-        ItemStack result = event.getResult();
-        if (result == null || result.isEmpty()) return;
-
-        // If it has Mending, we need to strip it.
-        // We work on a clone to ensure we're not modifying a reference that might be broken.
-        ItemStack cleanResult = result.clone();
-        if (stripMending(cleanResult)) {
-            event.setResult(cleanResult);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
     public void onLootGenerate(LootGenerateEvent event) {
         List<ItemStack> items = event.getLoot();
         for (ItemStack item : items) {
