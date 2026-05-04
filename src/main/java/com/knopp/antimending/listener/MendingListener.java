@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -70,11 +71,16 @@ public class MendingListener implements Listener {
 
     public void cleanPlayer(Player player) {
         org.bukkit.inventory.PlayerInventory inv = player.getInventory();
+        boolean changed = false;
         for (int i = 0; i < inv.getSize(); i++) {
             ItemStack item = inv.getItem(i);
             if (item != null && stripMending(item)) {
                 inv.setItem(i, item);
+                changed = true;
             }
+        }
+        if (changed) {
+            player.updateInventory();
         }
     }
 
@@ -109,6 +115,14 @@ public class MendingListener implements Listener {
         ItemStack cursor = event.getCursor();
         if (cursor != null && stripMending(cursor)) {
             event.getView().setCursor(cursor);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInventoryCreative(InventoryCreativeEvent event) {
+        ItemStack item = event.getCursor();
+        if (item != null && stripMending(item)) {
+            event.setCursor(item);
         }
     }
 
